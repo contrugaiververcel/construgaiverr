@@ -50,8 +50,8 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 space-y-6">
+    <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-8 space-y-6 bg-background">
         <div className="text-center space-y-2">
           <img src={logo} alt="Construgaiver" className="h-16 mx-auto" />
           <h1 className="text-2xl font-bold">

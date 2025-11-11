@@ -15,25 +15,17 @@ const MeusAnuncios = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
+      setUser(session?.user ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
+      setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -58,6 +50,21 @@ const MeusAnuncios = () => {
       setLoading(false);
     }
   };
+
+  if (!user) {
+    return (
+      <MainLayout>
+        <div className="p-4 space-y-4">
+          <h1 className="text-2xl font-bold">Meus Anúncios</h1>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <Plus className="h-16 w-16 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-2">Faça login para gerenciar seus anúncios</p>
+            <Button onClick={() => navigate("/auth")}>Fazer Login</Button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

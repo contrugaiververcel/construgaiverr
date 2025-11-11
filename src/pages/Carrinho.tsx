@@ -27,25 +27,17 @@ const Carrinho = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
+      setUser(session?.user ?? null);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate("/auth");
-        return;
-      }
-      setUser(session.user);
+      setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -103,6 +95,21 @@ const Carrinho = () => {
   };
 
   const total = items.reduce((acc, item) => acc + item.total, 0);
+
+  if (!user) {
+    return (
+      <MainLayout>
+        <div className="p-4 space-y-4">
+          <h1 className="text-2xl font-bold">Carrinho</h1>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-2">Faça login para ver seu carrinho</p>
+            <Button onClick={() => navigate("/auth")}>Fazer Login</Button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (loading) {
     return (
