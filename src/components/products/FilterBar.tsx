@@ -75,11 +75,23 @@ const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
           </div>
           <div className="space-y-2">
             <Label>Categoria</Label>
-            <Input
-              placeholder="Ex: Materiais"
+            <Select
               value={filters.categoria}
-              onChange={(e) => onFiltersChange({ ...filters, categoria: e.target.value })}
-            />
+              onValueChange={(value) => onFiltersChange({ ...filters, categoria: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="Materiais">Materiais</SelectItem>
+                <SelectItem value="Equipamentos">Equipamentos</SelectItem>
+                <SelectItem value="Ferramentas">Ferramentas</SelectItem>
+                <SelectItem value="Serviços">Serviços</SelectItem>
+                <SelectItem value="Transporte">Transporte</SelectItem>
+                <SelectItem value="Segurança">Segurança</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <Button
             variant="outline"

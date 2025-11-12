@@ -12,6 +12,7 @@ import Perfil from "./pages/Perfil";
 import Auth from "./pages/Auth";
 import ProductDetail from "./pages/ProductDetail";
 import MeusAnuncios from "./pages/MeusAnuncios";
+import NovoAnuncio from "./pages/NovoAnuncio";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/produto/:id" element={<ProductDetail />} />
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />
+          <Route path="/novo-anuncio" element={<NovoAnuncio />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -6,6 +6,8 @@ import ProductCard from "@/components/products/ProductCard";
 import FilterBar from "@/components/products/FilterBar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Anuncio {
   id: string;
@@ -69,39 +71,70 @@ const Home = () => {
     }
   };
 
+  const anunciosEmOferta = anuncios.filter((a) => a.preco < 500);
+  const anunciosRestantes = anuncios.filter((a) => a.preco >= 500);
+
   return (
     <MainLayout>
       <div className="p-4 space-y-4">
         {/* Header */}
-        <div className="bg-gradient-primary rounded-xl p-6 text-white shadow-orange">
-          <h1 className="text-2xl font-bold mb-2">
-            {user ? `Olá, ${user.email?.split("@")[0]}!` : "Olá!"}
-          </h1>
-          {!user && (
-            <p
-              className="text-sm opacity-90 cursor-pointer underline"
-              onClick={() => navigate("/auth")}
-            >
-              Faça login ou cadastre-se aqui
-            </p>
-          )}
+        <div className="bg-gradient-primary rounded-xl p-6 text-white shadow-orange flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">
+              {user ? `Olá, ${user.email?.split("@")[0]}!` : "Olá!"}
+            </h1>
+            {!user && (
+              <p
+                className="text-sm opacity-90 cursor-pointer underline"
+                onClick={() => navigate("/auth")}
+              >
+                Faça login ou cadastre-se aqui
+              </p>
+            )}
+          </div>
+          <Button
+            size="icon"
+            className="bg-white text-primary hover:bg-white/90 rounded-full h-12 w-12"
+            onClick={() => navigate("/novo-anuncio")}
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
         </div>
 
         {/* Filters */}
         <FilterBar filters={filters} onFiltersChange={setFilters} />
 
-        {/* Products Grid */}
-        <div className="space-y-4">
-          {loading ? (
-            <div className="text-center py-8 text-muted-foreground">Carregando...</div>
-          ) : anuncios.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Nenhum anúncio encontrado
-            </div>
-          ) : (
-            anuncios.map((anuncio) => <ProductCard key={anuncio.id} anuncio={anuncio} />)
-          )}
-        </div>
+        {/* Products Sections */}
+        {loading ? (
+          <div className="text-center py-8 text-muted-foreground">Carregando...</div>
+        ) : anuncios.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            Nenhum anúncio encontrado
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {anunciosEmOferta.length > 0 && (
+              <div className="space-y-3">
+                <h2 className="text-xl font-bold">Em oferta</h2>
+                <div className="space-y-3">
+                  {anunciosEmOferta.map((anuncio) => (
+                    <ProductCard key={anuncio.id} anuncio={anuncio} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {anunciosRestantes.length > 0 && (
+              <div className="space-y-3">
+                <h2 className="text-xl font-bold">Encontre o que precisa</h2>
+                <div className="space-y-3">
+                  {anunciosRestantes.map((anuncio) => (
+                    <ProductCard key={anuncio.id} anuncio={anuncio} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </MainLayout>
   );
