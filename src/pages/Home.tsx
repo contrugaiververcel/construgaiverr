@@ -6,7 +6,7 @@ import ProductCard from "@/components/products/ProductCard";
 import FilterBar from "@/components/products/FilterBar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Anuncio {
@@ -92,17 +92,32 @@ const Home = () => {
               </p>
             )}
           </div>
-          <Button
-            size="icon"
-            className="bg-white text-primary hover:bg-white/90 rounded-full h-12 w-12"
-            onClick={() => navigate("/novo-anuncio")}
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="icon"
+              className="bg-white text-primary hover:bg-white/90 rounded-full h-12 w-12"
+              onClick={() => toast.info("Notificações em breve!")}
+            >
+              <Bell className="h-6 w-6" />
+            </Button>
+            <Button
+              size="icon"
+              className="bg-white text-primary hover:bg-white/90 rounded-full h-12 w-12"
+              onClick={() => navigate("/novo-anuncio")}
+            >
+              <Plus className="h-6 w-6" />
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
         <FilterBar filters={filters} onFiltersChange={setFilters} />
+
+        {/* Banner */}
+        <div className="bg-gradient-to-r from-primary/90 to-primary rounded-xl p-6 text-white shadow-lg">
+          <h2 className="text-xl font-bold mb-2">Ofertas Especiais</h2>
+          <p className="text-sm opacity-90">Confira as melhores ofertas da construção civil!</p>
+        </div>
 
         {/* Products Sections */}
         {loading ? (
