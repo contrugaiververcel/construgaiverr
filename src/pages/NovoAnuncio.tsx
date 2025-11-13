@@ -26,11 +26,16 @@ const NovoAnuncio = () => {
     titulo: "",
     descricao: "",
     preco: "",
-    tipo: "",
-    categoria: "",
+    tipo: "Venda",
+    categoria: "Materiais",
     cidade: "",
     bairro: "",
     imagens: "",
+    medidas: "",
+    entrega: false,
+    condicao: "novo",
+    quantidade: "",
+    dias_locacao: "",
   });
 
   useEffect(() => {
@@ -73,6 +78,11 @@ const NovoAnuncio = () => {
         bairro: formData.bairro,
         imagens: imagensArray,
         usuario_id: user.id,
+        medidas: formData.medidas || null,
+        entrega: formData.entrega,
+        condicao: formData.condicao,
+        quantidade: formData.quantidade ? parseInt(formData.quantidade) : null,
+        dias_locacao: formData.dias_locacao ? parseInt(formData.dias_locacao) : null,
       });
 
       if (error) throw error;
@@ -236,6 +246,84 @@ const NovoAnuncio = () => {
                 Cole as URLs das imagens separadas por vírgula
               </p>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="medidas">Medidas (opcional)</Label>
+              <Input
+                id="medidas"
+                placeholder="Ex: 10x20cm, 5kg, etc"
+                value={formData.medidas}
+                onChange={(e) =>
+                  setFormData({ ...formData, medidas: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="entrega"
+                checked={formData.entrega}
+                onChange={(e) =>
+                  setFormData({ ...formData, entrega: e.target.checked })
+                }
+                className="h-4 w-4 rounded border-input"
+              />
+              <Label htmlFor="entrega" className="cursor-pointer">
+                Oferece entrega
+              </Label>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="condicao">Condição</Label>
+              <Select
+                value={formData.condicao}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, condicao: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a condição" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="novo">Novo</SelectItem>
+                  <SelectItem value="seminovo">Seminovo</SelectItem>
+                  <SelectItem value="usado">Usado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {formData.tipo !== "Locação" && (
+              <div className="space-y-2">
+                <Label htmlFor="quantidade">Quantidade disponível (opcional)</Label>
+                <Input
+                  id="quantidade"
+                  type="number"
+                  min="1"
+                  placeholder="Ex: 10"
+                  value={formData.quantidade}
+                  onChange={(e) =>
+                    setFormData({ ...formData, quantidade: e.target.value })
+                  }
+                />
+              </div>
+            )}
+
+            {formData.tipo === "Locação" && (
+              <div className="space-y-2">
+                <Label htmlFor="dias_locacao">Mínimo de dias para locação (opcional)</Label>
+                <Input
+                  id="dias_locacao"
+                  type="number"
+                  min="1"
+                  placeholder="Ex: 7"
+                  value={formData.dias_locacao}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dias_locacao: e.target.value })
+                  }
+                />
+              </div>
+            )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Criando..." : "Criar anúncio"}

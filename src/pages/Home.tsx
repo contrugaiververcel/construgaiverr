@@ -143,7 +143,16 @@ const Home = () => {
           <div className="space-y-6">
             {anunciosEmOferta.length > 0 && (
               <div className="space-y-3">
-                <h2 className="text-xl font-bold">Em oferta</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold">Em oferta</h2>
+                  <Button
+                    variant="link"
+                    className="text-primary p-0 h-auto"
+                    onClick={() => navigate("/todos-anuncios?secao=ofertas")}
+                  >
+                    Ver tudo
+                  </Button>
+                </div>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   {anunciosEmOferta.map((anuncio) => (
                     <ProductCardVertical 
@@ -175,7 +184,16 @@ const Home = () => {
 
             {anunciosRestantes.length > 0 && (
               <div className="space-y-3">
-                <h2 className="text-xl font-bold">Encontre o que precisa</h2>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold">Encontre o que precisa</h2>
+                  <Button
+                    variant="link"
+                    className="text-primary p-0 h-auto"
+                    onClick={() => navigate("/todos-anuncios")}
+                  >
+                    Ver tudo
+                  </Button>
+                </div>
                 <CategoryButtons 
                   selectedCategory={filters.categoria}
                   onCategoryChange={(categoria) => setFilters({ ...filters, categoria })}
