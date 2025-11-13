@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const TodosAnuncios = () => {
   const [searchParams] = useSearchParams();
@@ -100,6 +101,31 @@ const TodosAnuncios = () => {
                 <SheetTitle>Filtros Avançados</SheetTitle>
               </SheetHeader>
               <div className="space-y-6 mt-6">
+                {/* Location Filters - Priority */}
+                <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="font-semibold text-primary">📍 Localização (Importante para entrega)</h3>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="cidade-filter">Cidade</Label>
+                      <Input
+                        id="cidade-filter"
+                        placeholder="Ex: São Paulo"
+                        value={filters.cidade}
+                        onChange={(e) => setFilters({ ...filters, cidade: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bairro-filter">Bairro</Label>
+                      <Input
+                        id="bairro-filter"
+                        placeholder="Ex: Centro"
+                        value={filters.bairro}
+                        onChange={(e) => setFilters({ ...filters, bairro: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <FilterBar filters={filters} onFiltersChange={setFilters} />
                 
                 <div className="space-y-3">

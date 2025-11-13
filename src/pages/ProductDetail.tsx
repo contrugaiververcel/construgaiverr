@@ -242,7 +242,8 @@ const ProductDetail = () => {
           </Card>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 space-y-2">
+        {/* Fixed footer with bottom nav spacing */}
+        <div className="fixed bottom-16 left-0 right-0 bg-background border-t p-4 space-y-2">
           <p className="text-xs text-muted-foreground text-center">
             Total: R$ {totalCompra.toFixed(2)}
           </p>
