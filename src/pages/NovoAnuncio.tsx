@@ -17,6 +17,23 @@ import {
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import { z } from "zod";
+
+const anuncioSchema = z.object({
+  titulo: z.string().trim().min(3, "Título deve ter no mínimo 3 caracteres").max(200, "Título deve ter no máximo 200 caracteres"),
+  descricao: z.string().trim().min(10, "Descrição deve ter no mínimo 10 caracteres").max(2000, "Descrição deve ter no máximo 2000 caracteres"),
+  preco: z.number().positive("Preço deve ser maior que zero").max(999999999, "Preço muito alto"),
+  cidade: z.string().trim().min(2, "Cidade deve ter no mínimo 2 caracteres").max(100, "Cidade deve ter no máximo 100 caracteres"),
+  bairro: z.string().trim().min(2, "Bairro deve ter no mínimo 2 caracteres").max(100, "Bairro deve ter no máximo 100 caracteres"),
+  imagens: z.array(z.string().url("URL de imagem inválida")).max(10, "Máximo de 10 imagens permitidas").optional(),
+  medidas: z.string().trim().max(200, "Medidas devem ter no máximo 200 caracteres").optional(),
+  quantidade: z.number().int("Quantidade deve ser um número inteiro").positive("Quantidade deve ser maior que zero").max(999999, "Quantidade muito alta").optional(),
+  dias_locacao: z.number().int("Dias de locação deve ser um número inteiro").positive("Dias de locação deve ser maior que zero").max(365, "Máximo de 365 dias de locação").optional(),
+  tipo: z.enum(["Venda", "Locação", "Venda e Locação"]),
+  categoria: z.string().min(1, "Categoria é obrigatória"),
+  condicao: z.enum(["novo", "seminovo", "usado"]),
+  entrega: z.boolean(),
+});
 
 const NovoAnuncio = () => {
   const navigate = useNavigate();
@@ -68,21 +85,38 @@ const NovoAnuncio = () => {
         ? formData.imagens.split(",").map((img) => img.trim())
         : [];
 
-      const { error } = await supabase.from("anuncios").insert({
+      // Validate input data
+      const validatedData = anuncioSchema.parse({
         titulo: formData.titulo,
         descricao: formData.descricao,
         preco: parseFloat(formData.preco),
-        tipo: formData.tipo,
-        categoria: formData.categoria,
         cidade: formData.cidade,
         bairro: formData.bairro,
-        imagens: imagensArray,
-        usuario_id: user.id,
-        medidas: formData.medidas || null,
+        imagens: imagensArray.length > 0 ? imagensArray : undefined,
+        medidas: formData.medidas || undefined,
+        quantidade: formData.quantidade ? parseInt(formData.quantidade) : undefined,
+        dias_locacao: formData.dias_locacao ? parseInt(formData.dias_locacao) : undefined,
+        tipo: formData.tipo as "Venda" | "Locação" | "Venda e Locação",
+        categoria: formData.categoria,
+        condicao: formData.condicao as "novo" | "seminovo" | "usado",
         entrega: formData.entrega,
-        condicao: formData.condicao,
-        quantidade: formData.quantidade ? parseInt(formData.quantidade) : null,
-        dias_locacao: formData.dias_locacao ? parseInt(formData.dias_locacao) : null,
+      });
+
+      const { error } = await supabase.from("anuncios").insert({
+        titulo: validatedData.titulo,
+        descricao: validatedData.descricao,
+        preco: validatedData.preco,
+        tipo: validatedData.tipo,
+        categoria: validatedData.categoria,
+        cidade: validatedData.cidade,
+        bairro: validatedData.bairro,
+        imagens: validatedData.imagens || [],
+        usuario_id: user.id,
+        medidas: validatedData.medidas || null,
+        entrega: validatedData.entrega,
+        condicao: validatedData.condicao,
+        quantidade: validatedData.quantidade || null,
+        dias_locacao: validatedData.dias_locacao || null,
       });
 
       if (error) throw error;
@@ -90,8 +124,12 @@ const NovoAnuncio = () => {
       toast.success("Anúncio criado com sucesso!");
       navigate("/home");
     } catch (error: any) {
-      toast.error("Erro ao criar anúncio");
-      console.error(error);
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast.error(firstError.message);
+      } else {
+        toast.error("Erro ao criar anúncio. Por favor, tente novamente.");
+      }
     } finally {
       setLoading(false);
     }
