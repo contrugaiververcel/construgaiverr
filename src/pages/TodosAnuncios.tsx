@@ -32,21 +32,36 @@ const TodosAnuncios = () => {
 
   const fetchAnuncios = async () => {
     try {
-      let query = supabase.from("anuncios").select("*");
+      let query: any = supabase.from("anuncios").select("*");
 
-      if (filters.cidade) query = query.eq("cidade", filters.cidade);
-      if (filters.bairro) query = query.eq("bairro", filters.bairro);
-      if (filters.tipo) query = query.eq("tipo", filters.tipo);
-      if (filters.categoria) query = query.eq("categoria", filters.categoria);
+      // Apply simple equality filters
+      if (filters.cidade) {
+        query = query.eq("cidade", filters.cidade);
+      }
+      if (filters.bairro) {
+        query = query.eq("bairro", filters.bairro);
+      }
+      if (filters.tipo) {
+        query = query.eq("tipo", filters.tipo);
+      }
+      if (filters.categoria) {
+        query = query.eq("categoria", filters.categoria);
+      }
+      if (filters.entrega) {
+        query = query.eq("entrega", true);
+      }
+
+      // Apply condicao filter
       if (filters.condicao.length > 0) {
         query = query.in("condicao", filters.condicao);
       }
-      if (filters.entrega) query = query.eq("entrega", true);
       
+      // Apply ofertas filter
       if (secao === "ofertas") {
         query = query.lt("preco", 500);
       }
 
+      // Execute query
       const { data, error } = await query.order("criado_em", { ascending: false });
 
       if (error) throw error;
