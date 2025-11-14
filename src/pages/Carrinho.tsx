@@ -198,7 +198,10 @@ const Carrinho = () => {
                 <span className="text-lg">Total:</span>
                 <span className="text-2xl font-bold">R$ {total.toFixed(2)}</span>
               </div>
-              <Button className="w-full bg-white text-primary hover:bg-white/90">
+              <Button 
+                className="w-full bg-white text-primary hover:bg-white/90"
+                onClick={() => navigate("/checkout")}
+              >
                 Finalizar Compra
               </Button>
             </Card>

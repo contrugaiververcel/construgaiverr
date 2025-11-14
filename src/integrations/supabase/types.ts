@@ -19,11 +19,16 @@ export type Database = {
           bairro: string
           categoria: string
           cidade: string
+          condicao: string | null
           criado_em: string | null
           descricao: string
+          dias_locacao: number | null
+          entrega: boolean | null
           id: string
           imagens: string[] | null
+          medidas: string | null
           preco: number
+          quantidade: number | null
           tipo: string
           titulo: string
           usuario_id: string
@@ -32,11 +37,16 @@ export type Database = {
           bairro: string
           categoria: string
           cidade: string
+          condicao?: string | null
           criado_em?: string | null
           descricao: string
+          dias_locacao?: number | null
+          entrega?: boolean | null
           id?: string
           imagens?: string[] | null
+          medidas?: string | null
           preco: number
+          quantidade?: number | null
           tipo: string
           titulo: string
           usuario_id: string
@@ -45,11 +55,16 @@ export type Database = {
           bairro?: string
           categoria?: string
           cidade?: string
+          condicao?: string | null
           criado_em?: string | null
           descricao?: string
+          dias_locacao?: number | null
+          entrega?: boolean | null
           id?: string
           imagens?: string[] | null
+          medidas?: string | null
           preco?: number
+          quantidade?: number | null
           tipo?: string
           titulo?: string
           usuario_id?: string
@@ -106,6 +121,128 @@ export type Database = {
           },
         ]
       }
+      enderecos: {
+        Row: {
+          bairro: string
+          cep: string
+          cidade: string
+          criado_em: string | null
+          id: string
+          informacoes_adicionais: string | null
+          nome_destinatario: string
+          numero: string | null
+          rua: string
+          sem_numero: boolean | null
+          telefone_contato: string
+          tipo_endereco: string
+          uf: string
+          usuario_id: string
+        }
+        Insert: {
+          bairro: string
+          cep: string
+          cidade: string
+          criado_em?: string | null
+          id?: string
+          informacoes_adicionais?: string | null
+          nome_destinatario: string
+          numero?: string | null
+          rua: string
+          sem_numero?: boolean | null
+          telefone_contato: string
+          tipo_endereco: string
+          uf: string
+          usuario_id: string
+        }
+        Update: {
+          bairro?: string
+          cep?: string
+          cidade?: string
+          criado_em?: string | null
+          id?: string
+          informacoes_adicionais?: string | null
+          nome_destinatario?: string
+          numero?: string | null
+          rua?: string
+          sem_numero?: boolean | null
+          telefone_contato?: string
+          tipo_endereco?: string
+          uf?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      favoritos: {
+        Row: {
+          anuncio_id: string
+          criado_em: string | null
+          id: string
+          usuario_id: string
+        }
+        Insert: {
+          anuncio_id: string
+          criado_em?: string | null
+          id?: string
+          usuario_id: string
+        }
+        Update: {
+          anuncio_id?: string
+          criado_em?: string | null
+          id?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favoritos_anuncio_id_fkey"
+            columns: ["anuncio_id"]
+            isOneToOne: false
+            referencedRelation: "anuncios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itens_pedido: {
+        Row: {
+          anuncio_id: string
+          id: string
+          pedido_id: string
+          preco_unitario: number
+          quantidade: number
+          subtotal: number
+        }
+        Insert: {
+          anuncio_id: string
+          id?: string
+          pedido_id: string
+          preco_unitario: number
+          quantidade?: number
+          subtotal: number
+        }
+        Update: {
+          anuncio_id?: string
+          id?: string
+          pedido_id?: string
+          preco_unitario?: number
+          quantidade?: number
+          subtotal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_pedido_anuncio_id_fkey"
+            columns: ["anuncio_id"]
+            isOneToOne: false
+            referencedRelation: "anuncios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_pedido_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mensagens: {
         Row: {
           conteudo: string
@@ -145,33 +282,101 @@ export type Database = {
           },
         ]
       }
+      pedidos: {
+        Row: {
+          criado_em: string | null
+          endereco_id: string
+          id: string
+          opcao_entrega: string
+          status: string | null
+          total: number
+          usuario_id: string
+        }
+        Insert: {
+          criado_em?: string | null
+          endereco_id: string
+          id?: string
+          opcao_entrega: string
+          status?: string | null
+          total: number
+          usuario_id: string
+        }
+        Update: {
+          criado_em?: string | null
+          endereco_id?: string
+          id?: string
+          opcao_entrega?: string
+          status?: string | null
+          total?: number
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedidos_endereco_id_fkey"
+            columns: ["endereco_id"]
+            isOneToOne: false
+            referencedRelation: "enderecos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       usuarios: {
         Row: {
+          aceito_termos: boolean | null
           bairro: string | null
           cidade: string | null
           criado_em: string | null
+          data_nascimento: string | null
           email: string
           id: string
           nome: string
           telefone: string | null
+          telefone_movel: string | null
         }
         Insert: {
+          aceito_termos?: boolean | null
           bairro?: string | null
           cidade?: string | null
           criado_em?: string | null
+          data_nascimento?: string | null
           email: string
           id?: string
           nome: string
           telefone?: string | null
+          telefone_movel?: string | null
         }
         Update: {
+          aceito_termos?: boolean | null
           bairro?: string | null
           cidade?: string | null
           criado_em?: string | null
+          data_nascimento?: string | null
           email?: string
           id?: string
           nome?: string
           telefone?: string | null
+          telefone_movel?: string | null
         }
         Relationships: []
       }
@@ -180,10 +385,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "cliente" | "vendedor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -310,6 +521,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["cliente", "vendedor"],
+    },
   },
 } as const
