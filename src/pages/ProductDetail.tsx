@@ -5,7 +5,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, ShoppingCart, Package, Ruler, Truck, Tag, Calendar } from "lucide-react";
+import { ArrowLeft, MapPin, ShoppingCart, Package, Ruler, Truck, Tag, Calendar, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const [user, setUser] = useState<any>(null);
   const [quantidade, setQuantidade] = useState(1);
   const [diasLocacao, setDiasLocacao] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -36,8 +37,11 @@ const ProductDetail = () => {
   useEffect(() => {
     if (id) {
       fetchAnuncio();
+      if (user) {
+        checkFavorite();
+      }
     }
-  }, [id]);
+  }, [id, user]);
 
   const fetchAnuncio = async () => {
     try {
@@ -54,6 +58,58 @@ const ProductDetail = () => {
       navigate("/home");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkFavorite = async () => {
+    if (!user || !id) return;
+    
+    try {
+      const { data } = await supabase
+        .from("favoritos")
+        .select("id")
+        .eq("usuario_id", user.id)
+        .eq("anuncio_id", id)
+        .single();
+      
+      setIsFavorite(!!data);
+    } catch (error) {
+      // Não é favorito
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      toast.error("Faça login para adicionar aos favoritos");
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        const { error } = await supabase
+          .from("favoritos")
+          .delete()
+          .eq("usuario_id", user.id)
+          .eq("anuncio_id", id);
+        
+        if (error) throw error;
+        setIsFavorite(false);
+        toast.success("Removido dos favoritos");
+      } else {
+        const { error } = await supabase
+          .from("favoritos")
+          .insert({
+            usuario_id: user.id,
+            anuncio_id: id,
+          });
+        
+        if (error) throw error;
+        setIsFavorite(true);
+        toast.success("Adicionado aos favoritos!");
+      }
+    } catch (error: any) {
+      toast.error("Erro ao atualizar favoritos");
     }
   };
 
@@ -107,9 +163,19 @@ const ProductDetail = () => {
     <MainLayout>
       <div className="pb-24">
         <div className="sticky top-0 bg-background z-10 p-4 border-b">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFavorite}
+              className={isFavorite ? "text-primary" : ""}
+            >
+              <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+            </Button>
+          </div>
         </div>
 
         {anuncio.imagens && anuncio.imagens.length > 0 && (

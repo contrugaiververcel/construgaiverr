@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
@@ -14,6 +16,10 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
+  const [telefoneMovel, setTelefoneMovel] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+  const [tipoUsuario, setTipoUsuario] = useState<"cliente" | "vendedor">("cliente");
+  const [aceitoTermos, setAceitoTermos] = useState(false);
   const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -30,11 +36,23 @@ const Auth = () => {
         toast.success("Login realizado com sucesso!");
         navigate("/home");
       } else {
+        if (!aceitoTermos) {
+          toast.error("Você precisa aceitar os termos e condições");
+          setLoading(false);
+          return;
+        }
+        
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { nome },
+            data: { 
+              nome,
+              telefone_movel: telefoneMovel,
+              data_nascimento: dataNascimento,
+              aceito_termos: aceitoTermos,
+              role: tipoUsuario
+            },
             emailRedirectTo: `${window.location.origin}/home`,
           },
         });
@@ -66,21 +84,64 @@ const Auth = () => {
 
         <form onSubmit={handleAuth} className="space-y-4">
           {!isLogin && (
-            <div className="space-y-2">
-              <Label htmlFor="nome">Nome</Label>
-              <Input
-                id="nome"
-                type="text"
-                placeholder="Seu nome"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
-                required={!isLogin}
-              />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome*</Label>
+                <Input
+                  id="nome"
+                  type="text"
+                  placeholder="Seu nome completo"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  required={!isLogin}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="telefone">Telefone móvel*</Label>
+                <Input
+                  id="telefone"
+                  type="tel"
+                  placeholder="(00) 00000-0000"
+                  value={telefoneMovel}
+                  onChange={(e) => setTelefoneMovel(e.target.value)}
+                  required={!isLogin}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dataNascimento">Data de nascimento*</Label>
+                <Input
+                  id="dataNascimento"
+                  type="date"
+                  value={dataNascimento}
+                  onChange={(e) => setDataNascimento(e.target.value)}
+                  required={!isLogin}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tipo de conta*</Label>
+                <RadioGroup value={tipoUsuario} onValueChange={(value: any) => setTipoUsuario(value)}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="cliente" id="cliente" />
+                    <Label htmlFor="cliente" className="font-normal cursor-pointer">
+                      Cliente - Apenas compras
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="vendedor" id="vendedor" />
+                    <Label htmlFor="vendedor" className="font-normal cursor-pointer">
+                      Vendedor/Locatário - Anunciar produtos
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email">E-mail*</Label>
             <Input
               id="email"
               type="email"
@@ -92,7 +153,7 @@ const Auth = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">Senha*</Label>
             <Input
               id="password"
               type="password"
@@ -103,6 +164,20 @@ const Auth = () => {
               minLength={6}
             />
           </div>
+
+          {!isLogin && (
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="termos"
+                checked={aceitoTermos}
+                onCheckedChange={(checked) => setAceitoTermos(checked as boolean)}
+                required={!isLogin}
+              />
+              <Label htmlFor="termos" className="text-sm font-normal cursor-pointer">
+                Aceito os termos e condições e políticas*
+              </Label>
+            </div>
+          )}
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Processando..." : isLogin ? "Entrar" : "Cadastrar"}
