@@ -18,6 +18,7 @@ import Checkout from "./pages/Checkout";
 import Favoritos from "./pages/Favoritos";
 import Pedidos from "./pages/Pedidos";
 import EditarAnuncio from "./pages/EditarAnuncio";
+import PainelVendedor from "./pages/PainelVendedor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/favoritos" element={<Favoritos />} />
           <Route path="/pedidos" element={<Pedidos />} />
+          <Route path="/painel-vendedor" element={<PainelVendedor />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
