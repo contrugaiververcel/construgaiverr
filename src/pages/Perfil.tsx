@@ -3,13 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Package } from "lucide-react";
+import { User, LogOut, Package, Heart, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const Perfil = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +18,7 @@ const Perfil = () => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
+        fetchUserRole(session.user.id);
       }
     });
 
@@ -26,6 +28,7 @@ const Perfil = () => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
+        fetchUserRole(session.user.id);
       }
     });
 
@@ -39,6 +42,15 @@ const Perfil = () => {
       .eq("id", userId)
       .single();
     setProfile(data);
+  };
+
+  const fetchUserRole = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+    setUserRole(data?.role || null);
   };
 
   const handleLogout = async () => {
@@ -100,11 +112,31 @@ const Perfil = () => {
           <Button
             variant="outline"
             className="w-full justify-start"
+            onClick={() => navigate("/favoritos")}
+          >
+            <Heart className="h-5 w-5 mr-2" />
+            Meus Favoritos
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-start"
             onClick={() => navigate("/meus-anuncios")}
           >
             <Package className="h-5 w-5 mr-2" />
             Meus Anúncios
           </Button>
+
+          {userRole === "vendedor" && (
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => navigate("/painel-vendedor")}
+            >
+              <Store className="h-5 w-5 mr-2" />
+              Painel do Vendedor
+            </Button>
+          )}
 
           <Button
             variant="outline"

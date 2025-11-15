@@ -346,11 +346,15 @@ export type Database = {
           aceito_termos: boolean | null
           bairro: string | null
           cidade: string | null
+          cnpj: string | null
           criado_em: string | null
           data_nascimento: string | null
+          descricao_empresa: string | null
           email: string
           id: string
+          logo_empresa: string | null
           nome: string
+          nome_empresa: string | null
           telefone: string | null
           telefone_movel: string | null
         }
@@ -358,11 +362,15 @@ export type Database = {
           aceito_termos?: boolean | null
           bairro?: string | null
           cidade?: string | null
+          cnpj?: string | null
           criado_em?: string | null
           data_nascimento?: string | null
+          descricao_empresa?: string | null
           email: string
           id?: string
+          logo_empresa?: string | null
           nome: string
+          nome_empresa?: string | null
           telefone?: string | null
           telefone_movel?: string | null
         }
@@ -370,11 +378,15 @@ export type Database = {
           aceito_termos?: boolean | null
           bairro?: string | null
           cidade?: string | null
+          cnpj?: string | null
           criado_em?: string | null
           data_nascimento?: string | null
+          descricao_empresa?: string | null
           email?: string
           id?: string
+          logo_empresa?: string | null
           nome?: string
+          nome_empresa?: string | null
           telefone?: string | null
           telefone_movel?: string | null
         }
