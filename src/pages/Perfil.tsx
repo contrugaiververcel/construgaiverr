@@ -81,13 +81,28 @@ const Perfil = () => {
 
         <Card className="p-6 space-y-4">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="h-8 w-8 text-primary" />
-            </div>
-            <div>
+            {profile?.logo_empresa ? (
+              <img
+                src={profile.logo_empresa}
+                alt="Foto de perfil"
+                className="h-16 w-16 rounded-full object-cover"
+              />
+            ) : (
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="h-8 w-8 text-primary" />
+              </div>
+            )}
+            <div className="flex-1">
               <h2 className="text-xl font-semibold">{profile?.nome || "Usuário"}</h2>
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/editar-perfil")}
+            >
+              Editar
+            </Button>
           </div>
 
           {profile?.cidade && (
