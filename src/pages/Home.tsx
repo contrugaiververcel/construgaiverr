@@ -23,6 +23,8 @@ interface Anuncio {
 
 const Home = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -36,16 +38,59 @@ const Home = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        fetchUserRole(session.user.id);
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        fetchUserRole(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("usuarios")
+      .select("nome, logo_empresa")
+      .eq("id", userId)
+      .single();
+    setProfile(data);
+  };
+
+  const fetchUserRole = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .single();
+    setUserRole(data?.role || null);
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const handleCreateButtonClick = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    navigate(userRole === "vendedor" ? "/novo-anuncio" : "/todos-anuncios");
+  };
 
   useEffect(() => {
     fetchAnuncios();
@@ -81,18 +126,33 @@ const Home = () => {
       <div className="p-4 space-y-4">
         {/* Header */}
         <div className="bg-gradient-primary rounded-xl p-6 text-white shadow-orange flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold mb-2">
-              {user ? `Olá, ${user.email?.split("@")[0]}!` : "Olá!"}
-            </h1>
-            {!user && (
-              <p
-                className="text-sm opacity-90 cursor-pointer underline"
-                onClick={() => navigate("/auth")}
-              >
-                Faça login ou cadastre-se aqui
-              </p>
+          <div className="flex items-center gap-3">
+            {user && profile && (
+              profile.logo_empresa ? (
+                <img
+                  src={profile.logo_empresa}
+                  alt="Foto de perfil"
+                  className="h-12 w-12 rounded-full object-cover border-2 border-white"
+                />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center text-lg font-semibold border-2 border-white">
+                  {profile.nome ? getInitials(profile.nome) : "?"}
+                </div>
+              )
             )}
+            <div>
+              <h1 className="text-2xl font-bold mb-2">
+                {user && profile?.nome ? `Olá, ${profile.nome.split(" ")[0]}!` : user ? `Olá, ${user.email?.split("@")[0]}!` : "Olá!"}
+              </h1>
+              {!user && (
+                <p
+                  className="text-sm opacity-90 cursor-pointer underline"
+                  onClick={() => navigate("/auth")}
+                >
+                  Faça login ou cadastre-se aqui
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex gap-2">
             <Button
@@ -105,7 +165,7 @@ const Home = () => {
             <Button
               size="icon"
               className="bg-white text-primary hover:bg-white/90 rounded-full h-12 w-12"
-              onClick={() => navigate("/novo-anuncio")}
+              onClick={handleCreateButtonClick}
             >
               <Plus className="h-6 w-6" />
             </Button>
