@@ -120,14 +120,16 @@ export type Database = {
           quantidade: number
           total: number
           usuario_id: string
+          dias_locacao?: number | null
         }
         Insert: {
           anuncio_id: string
           criado_em?: string | null
           id?: string
           quantidade?: number
-          total: number
+          total?: number
           usuario_id: string
+          dias_locacao?: number | null
         }
         Update: {
           anuncio_id?: string
@@ -136,6 +138,7 @@ export type Database = {
           quantidade?: number
           total?: number
           usuario_id?: string
+          dias_locacao?: number | null
         }
         Relationships: [
           {
@@ -244,6 +247,7 @@ export type Database = {
           subtotal: number
           status: string | null
           codigo_rastreio: string | null
+          dias_locacao?: number | null
         }
         Insert: {
           anuncio_id: string
@@ -251,9 +255,10 @@ export type Database = {
           pedido_id: string
           preco_unitario: number
           quantidade?: number
-          subtotal: number
+          subtotal?: number
           status?: string | null
           codigo_rastreio?: string | null
+          dias_locacao?: number | null
         }
         Update: {
           anuncio_id?: string
@@ -264,6 +269,7 @@ export type Database = {
           subtotal?: number
           status?: string | null
           codigo_rastreio?: string | null
+          dias_locacao?: number | null
         }
         Relationships: [
           {

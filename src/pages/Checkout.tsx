@@ -134,13 +134,15 @@ const Checkout = () => {
 
       if (pedidoError) throw pedidoError;
 
-      // Criar itens do pedido
       const itens = carrinho.map((item) => ({
         pedido_id: pedidoData.id,
         anuncio_id: item.anuncio_id,
         quantidade: item.quantidade,
+        dias_locacao: item.dias_locacao,
+        // Preço e subtotal são OBRIGATORIAMENTE calculados no Supabase agora (pelo trigger)
+        // Enviamos um valor dummy só para passar pelo Type checker se precisar
         preco_unitario: item.anuncio.preco,
-        subtotal: item.total,
+        subtotal: 0,
       }));
 
       const { data: itensInseridos, error: itensError } = await supabase

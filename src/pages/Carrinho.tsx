@@ -12,11 +12,13 @@ interface CarrinhoItem {
   id: string;
   quantidade: number;
   total: number;
+  dias_locacao: number | null;
   anuncio: {
     id: string;
     titulo: string;
     preco: number;
     imagens: string[];
+    tipo: string;
   };
 }
 
@@ -60,15 +62,14 @@ const Carrinho = () => {
       const item = items.find((i) => i.id === itemId);
       if (!item) return;
 
-      const novoTotal = item.anuncio.preco * novaQuantidade;
-
+      // O Supabase vai recalcular no backend, aqui só mandamos a nova qtd
       const { error } = await supabase
         .from("carrinho")
-        .update({ quantidade: novaQuantidade, total: novoTotal })
+        .update({ quantidade: novaQuantidade })
         .eq("id", itemId);
 
       if (error) throw error;
-      fetchCarrinho();
+      fetchCarrinho(); // Recarrega para obter o novo 'total' seguro do banco
     } catch (error: any) {
       toast.error("Erro ao atualizar quantidade");
     }
@@ -146,8 +147,19 @@ const Carrinho = () => {
                     </div>
                     <div className="flex-1 space-y-2">
                       <h3 className="font-semibold line-clamp-2">{item.anuncio.titulo}</h3>
-                      <p className="text-primary font-bold">
-                        R$ {item.anuncio.preco.toFixed(2)}
+                      <p className="text-secondary-foreground text-sm flex gap-2 items-center">
+                        <div>
+                          <span className="font-medium text-primary">Preço original:</span> R$ {item.anuncio.preco.toFixed(2)} {item.anuncio.tipo === "Locação" ? "/dia" : ""}
+                        </div>
+                        {item.anuncio.tipo === "Locação" && item.dias_locacao && (
+                          <div className="bg-primary/10 px-2 py-0.5 rounded-full text-xs text-primary font-semibold">
+                            {item.dias_locacao} {item.dias_locacao === 1 ? 'dia' : 'dias'}
+                          </div>
+                        )}
+                      </p>
+                      
+                      <p className="text-primary font-bold text-lg">
+                        R$ {item.total.toFixed(2)} <span className="text-sm font-normal text-muted-foreground ml-1">(subtotal)</span>
                       </p>
                       <div className="flex items-center gap-2">
                         <Button

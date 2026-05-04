@@ -262,7 +262,14 @@ const PainelVendedor = () => {
                     <div className="flex flex-col sm:flex-row justify-between gap-4">
                       <div className="flex-1">
                         <p className="font-medium text-base mb-1">{item.anuncio?.titulo}</p>
-                        <p className="text-sm text-muted-foreground mb-1">Quantidade: {item.quantidade}</p>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Quantidade: {item.quantidade}
+                          {item.anuncio?.tipo === "Locação" && item.dias_locacao && (
+                            <span className="ml-2 px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
+                              {item.dias_locacao} {item.dias_locacao === 1 ? 'dia' : 'dias'}
+                            </span>
+                          )}
+                        </p>
                         <p className="font-bold text-lg text-primary">
                           R$ {(Number(item.subtotal) * 0.9).toFixed(2)}
                           <span className="text-xs text-muted-foreground font-normal ml-2">(já com taxa de 10%)</span>

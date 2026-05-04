@@ -200,18 +200,14 @@ const ProductDetail = () => {
 
     const qtd = Math.max(1, parseInt(quantidade) || 1);
     const dias = Math.max(1, parseInt(diasLocacao) || 1);
-    // For rentals: store days as quantidade and multiply by items in total
-    const cartQuantidade = anuncio.tipo === "Locação" ? dias : qtd;
-    const cartTotal = anuncio.tipo === "Locação"
-      ? anuncio.preco * dias * qtd
-      : anuncio.preco * qtd;
 
     try {
+      // O Supabase vai calcular o 'total' via Trigger antes de inserir, garantindo a segurança
       const { error } = await supabase.from("carrinho").insert({
         usuario_id: user.id,
         anuncio_id: anuncio.id,
-        quantidade: cartQuantidade,
-        total: cartTotal,
+        quantidade: qtd,
+        dias_locacao: anuncio.tipo === "Locação" ? dias : null,
       });
 
       if (error) {
@@ -369,7 +365,8 @@ const ProductDetail = () => {
             <div className="flex items-start justify-between gap-4">
               <h1 className="text-2xl font-bold flex-1">{anuncio.titulo}</h1>
               <p className="text-2xl font-bold text-primary whitespace-nowrap">
-                R$ {anuncio.preco.toFixed(2)}
+                R$ {anuncio.preco.toFixed(2)} 
+                {anuncio.tipo === "Locação" && <span className="text-sm font-normal text-muted-foreground ml-1">/dia</span>}
               </p>
             </div>
 
