@@ -510,6 +510,24 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_users: {
+        Row: {
+          id: string
+          user_id: string
+          criado_em: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          criado_em?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          criado_em?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -527,6 +545,12 @@ export type Database = {
           vendedor_id: string
         }
         Returns: any[]
+      }
+      is_admin: {
+        Args: {
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

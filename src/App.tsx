@@ -26,6 +26,7 @@ import PainelVendedor from "./pages/PainelVendedor";
 import PerfilVendedor from "./pages/PerfilVendedor";
 import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
+import AdminRoute from "./components/admin/AdminRoute";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,7 +61,14 @@ const App = () => (
             <Route path="/painel-vendedor" element={<PainelVendedor />} />
             <Route path="/perfil-vendedor/:id" element={<PerfilVendedor />} />
             <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/gerenciar-painel-administrativo" element={<AdminPanel />} />
+            <Route
+              path="/gerenciar-painel-administrativo"
+              element={
+                <AdminRoute>
+                  <AdminPanel />
+                </AdminRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

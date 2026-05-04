@@ -3,10 +3,26 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.0";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// ── CORS: restrito às origens conhecidas da aplicação ─────────────────────────
+const ALLOWED_ORIGINS = [
+  "https://construgaiver.vercel.app",
+  "https://www.construgaiver.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+function getCorsHeaders(origin: string | null) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin)
+    ? origin
+    : ALLOWED_ORIGINS[0];
+
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
 
 interface EmailPayload {
   orderId?: string;
@@ -16,9 +32,38 @@ interface EmailPayload {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin");
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // ── AUTH: verificar JWT do usuário chamante ────────────────────────────────
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Não autorizado" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  // Verificar token com o cliente anon (valida JWT sem bypass de RLS)
+  const supabaseUser = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+    { global: { headers: { Authorization: authHeader } } }
+  );
+
+  const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: "Não autorizado" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   const logoUrl = "https://magaiver.app.br/wp-content/uploads/2026/03/Agenda_ai__15_-removebg-preview.png";
   const headerHtml = `
@@ -31,6 +76,7 @@ serve(async (req) => {
     const payload: EmailPayload = await req.json();
     const { orderId, itemId, type, newStatus } = payload;
 
+    // Cliente admin para buscar dados (bypassa RLS com service role)
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -47,7 +93,7 @@ serve(async (req) => {
     let html = "";
 
     if (type === "CONFIRMATION" && orderId) {
-      // Fetch order and buyer
+      // Verificar que o pedido pertence ao usuário chamante
       const { data: order, error: orderError } = await supabaseAdmin
         .from("pedidos")
         .select("*, comprador:usuarios(*), itens:itens_pedido(*, anuncio:anuncios(*))")
@@ -55,6 +101,14 @@ serve(async (req) => {
         .single();
 
       if (orderError || !order) throw new Error("Pedido não encontrado");
+
+      // Garantir que apenas o dono do pedido pode disparar e-mail de confirmação
+      if (order.usuario_id !== user.id) {
+        return new Response(JSON.stringify({ error: "Acesso negado" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       emailTo = order.comprador.email;
       subject = `Pedido Confirmado #${orderId.slice(0, 8)} - Construgaiver`;
@@ -79,7 +133,6 @@ serve(async (req) => {
         </div>
       `;
     } else if (type === "SALE" && itemId) {
-      // Fetch item and seller
       const { data: item, error: itemError } = await supabaseAdmin
         .from("itens_pedido")
         .select("*, anuncio:anuncios(*, vendedor:usuarios(*)), pedido:pedidos(*, comprador:usuarios(*))")
@@ -87,6 +140,14 @@ serve(async (req) => {
         .single();
 
       if (itemError || !item) throw new Error("Item da venda não encontrado");
+
+      // Apenas o comprador do pedido pode disparar notificação de venda
+      if (item.pedido.usuario_id !== user.id) {
+        return new Response(JSON.stringify({ error: "Acesso negado" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
       emailTo = item.anuncio.vendedor.email;
       subject = `Você realizou uma nova venda! - Item #${itemId.slice(0, 8)}`;
@@ -105,7 +166,6 @@ serve(async (req) => {
         </div>
       `;
     } else if (type === "STATUS_UPDATE" && itemId) {
-      // Fetch item and buyer
       const { data: item, error: itemError } = await supabaseAdmin
         .from("itens_pedido")
         .select("*, anuncio:anuncios(*), pedido:pedidos(*, comprador:usuarios(*))")
@@ -161,7 +221,8 @@ serve(async (req) => {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error(String(e));
     console.error("Erro na Edge Function:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,

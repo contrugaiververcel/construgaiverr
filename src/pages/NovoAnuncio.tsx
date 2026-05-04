@@ -59,9 +59,18 @@ const NovoAnuncio = () => {
     dias_locacao: "",
   });
 
+  const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
+    // Validação de tipo MIME real (não apenas extensão do arquivo)
+    const invalidFiles = files.filter((f) => !ALLOWED_MIME_TYPES.includes(f.type));
+    if (invalidFiles.length > 0) {
+      toast.error("Apenas imagens JPG, PNG, WebP ou GIF são permitidas.");
+      return;
+    }
+
     if (imageFiles.length + files.length > 10) {
       toast.error("Você pode enviar no máximo 10 imagens");
       return;

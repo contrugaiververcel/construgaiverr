@@ -15,7 +15,6 @@ import { ArrowLeft, Upload, X } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 
-const ADMIN_SESSION_KEY = "construgaiver_admin_session";
 
 const anuncioSchema = z.object({
   titulo: z.string().min(5, "Título deve ter no mínimo 5 caracteres").max(100),
@@ -62,12 +61,18 @@ const EditarAnuncio = () => {
   const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
-    const isAdminSession = localStorage.getItem(ADMIN_SESSION_KEY) === "true";
-    setIsAdmin(isAdminSession);
-
-    if (!user && !isAdminSession) {
-      navigate("/auth");
-    }
+    const checkAccess = async () => {
+      if (user) {
+        // Verifica server-side se o usuário logado é administrador
+        const { data: adminCheck } = await supabase.rpc("is_admin", {
+          _user_id: user.id,
+        });
+        setIsAdmin(!!adminCheck);
+      } else {
+        navigate("/auth");
+      }
+    };
+    checkAccess();
   }, [user, navigate]);
 
   useEffect(() => {
@@ -117,10 +122,19 @@ const EditarAnuncio = () => {
     }
   };
 
+  const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const totalImages = existingImages.length + imageFiles.length + files.length;
-    
+
+    // Validação de tipo MIME real (não apenas extensão)
+    const invalidFiles = files.filter((f) => !ALLOWED_MIME_TYPES.includes(f.type));
+    if (invalidFiles.length > 0) {
+      toast.error("Apenas imagens JPG, PNG, WebP ou GIF são permitidas.");
+      return;
+    }
+
     if (totalImages > 10) {
       toast.error("Máximo de 10 imagens permitido");
       return;
