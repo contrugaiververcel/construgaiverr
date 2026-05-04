@@ -18,7 +18,9 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState(""); // Renomeado de telefoneMovel
-  const [dataNascimento, setDataNascimento] = useState("");
+  const [diaNasc, setDiaNasc] = useState("");
+  const [mesNasc, setMesNasc] = useState("");
+  const [anoNasc, setAnoNasc] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState<"cliente" | "vendedor">("cliente");
   const [aceitoTermos, setAceitoTermos] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -44,6 +46,9 @@ const Auth = () => {
           return;
         }
         
+        const dataNascimento = anoNasc && mesNasc && diaNasc
+          ? `${anoNasc}-${mesNasc}-${diaNasc}`
+          : "";
         // Cadastro com confirmação de e-mail
         const { error } = await supabase.auth.signUp({
           email,
@@ -119,14 +124,56 @@ const Auth = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dataNascimento">Data de nascimento*</Label>
-                <Input
-                  id="dataNascimento"
-                  type="date"
-                  value={dataNascimento}
-                  onChange={(e) => setDataNascimento(e.target.value)}
-                  required={!isLogin}
-                />
+                <Label>Data de nascimento*</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Dia */}
+                  <select
+                    value={diaNasc}
+                    onChange={(e) => setDiaNasc(e.target.value)}
+                    required={!isLogin}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Dia</option>
+                    {Array.from({ length: 31 }, (_, i) => (
+                      <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Mês */}
+                  <select
+                    value={mesNasc}
+                    onChange={(e) => setMesNasc(e.target.value)}
+                    required={!isLogin}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Mês</option>
+                    {["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"].map((m, i) => (
+                      <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Ano */}
+                  <select
+                    value={anoNasc}
+                    onChange={(e) => setAnoNasc(e.target.value)}
+                    required={!isLogin}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  >
+                    <option value="">Ano</option>
+                    {Array.from({ length: 91 }, (_, i) => {
+                      const year = 2010 - i;
+                      return (
+                        <option key={year} value={String(year)}>
+                          {year}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-2">

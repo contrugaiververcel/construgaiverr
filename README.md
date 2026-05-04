@@ -1,73 +1,63 @@
-# Welcome to your Lovable project
+# Construgaiver
 
-## Project info
+Bem-vindo ao repositório do **Construgaiver**, a sua plataforma e marketplace ideal para materiais de construção e serviços relacionados. 
 
-**URL**: https://lovable.dev/projects/3cdbc1f7-ce28-4e15-83ab-e84cbfb07c07
+Este projeto é uma aplicação web moderna construída para oferecer uma experiência de ponta tanto para os clientes que buscam ferramentas e materiais, quanto para os vendedores que gerenciam seus produtos, controle de vendas e pedidos.
 
-## How can I edit this code?
+## Tecnologias Utilizadas
 
-There are several ways of editing your application.
+O projeto foi desenvolvido com as seguintes tecnologias:
 
-**Use Lovable**
+- **React** e **Vite** para interfaces rápidas, dinâmicas e servidor de desenvolvimento leve
+- **TypeScript** para uma base de código mais segura, com tipagem estática e escalável
+- **Tailwind CSS** para estilização utilitária e desenvolvimento responsivo rápido
+- **shadcn/ui** para componentes de interface elegantes, consistentes e acessíveis
+- **Supabase** como _Backend-as-a-Service_ (BaaS), gerenciando o banco de dados PostgreSQL, autenticação de usuários e _Edge Functions_
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3cdbc1f7-ce28-4e15-83ab-e84cbfb07c07) and start prompting.
+## Como executar o projeto localmente
 
-Changes made via Lovable will be committed automatically to this repo.
+Siga os passos abaixo para rodar o projeto diretamente em sua máquina para desenvolvimento e testes:
 
-**Use your preferred IDE**
+### 1. Pré-requisitos
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Certifique-se de ter o **Node.js** (versão 18+ recomendada) e o **npm** instalados em sua máquina.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 2. Clonando o repositório
 
-Follow these steps:
+Abra o seu terminal e execute:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+git clone <URL_DO_SEU_REPOSITORIO>
+cd construgaiver
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 3. Instalando dependências
 
-# Step 3: Install the necessary dependencies.
-npm i
+Execute o comando abaixo para baixar e instalar todas as dependências do projeto listadas no `package.json`:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
+```
+
+### 4. Configurando Variáveis de Ambiente
+
+Para conectar a aplicação ao banco de dados e outros serviços, você precisará configurar as variáveis de ambiente.
+Crie um arquivo `.env` na raiz do projeto e configure as chaves necessárias (URL do projeto Supabase e chave de API anônima).
+
+### 5. Executando o servidor de desenvolvimento
+
+Inicie o servidor local com o comando:
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+O Vite iniciará o servidor, e o projeto estará disponível no seu navegador, geralmente no endereço [http://localhost:8080](http://localhost:8080) ou na porta indicada no terminal.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Estrutura Principal
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/3cdbc1f7-ce28-4e15-83ab-e84cbfb07c07) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Algumas das áreas principais do sistema incluem:
+- **Painel do Vendedor**: Gerenciamento de itens e ferramentas à venda.
+- **Pedidos e Checkout**: Fluxo completo de compra, carrinho e confirmação para os usuários finais.
+- **Perfil do Usuário**: Atualização de dados e histórico de atividades.
+- **Edge Functions**: Como o envio automatizado de e-mails de confirmação de pedido via Supabase.

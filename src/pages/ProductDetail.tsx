@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, MapPin, ShoppingCart, Package, Ruler, Truck, Tag, Heart, Star, Share2 } from "lucide-react";
+import { ArrowLeft, MapPin, ShoppingCart, Package, Ruler, Truck, Tag, Heart, Star, Share2, Boxes, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Input } from "@/components/ui/input";
@@ -20,8 +20,8 @@ const ProductDetail = () => {
   const [anuncio, setAnuncio] = useState<any>(null);
   const [vendedor, setVendedor] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [quantidade, setQuantidade] = useState(1);
-  const [diasLocacao, setDiasLocacao] = useState(1);
+  const [quantidade, setQuantidade] = useState("1");
+  const [diasLocacao, setDiasLocacao] = useState("1");
   const [isFavorite, setIsFavorite] = useState(false);
   const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
   const [mediaAvaliacoes, setMediaAvaliacoes] = useState(0);
@@ -198,15 +198,20 @@ const ProductDetail = () => {
       return;
     }
 
-    const qty = anuncio.tipo === "Locação" ? diasLocacao : quantidade;
-    const total = anuncio.preco * qty;
+    const qtd = Math.max(1, parseInt(quantidade) || 1);
+    const dias = Math.max(1, parseInt(diasLocacao) || 1);
+    // For rentals: store days as quantidade and multiply by items in total
+    const cartQuantidade = anuncio.tipo === "Locação" ? dias : qtd;
+    const cartTotal = anuncio.tipo === "Locação"
+      ? anuncio.preco * dias * qtd
+      : anuncio.preco * qtd;
 
     try {
       const { error } = await supabase.from("carrinho").insert({
         usuario_id: user.id,
         anuncio_id: anuncio.id,
-        quantidade: qty,
-        total: total,
+        quantidade: cartQuantidade,
+        total: cartTotal,
       });
 
       if (error) {
@@ -283,12 +288,12 @@ const ProductDetail = () => {
     ));
   };
 
+  const qtdVal = Math.max(1, parseInt(quantidade) || 1);
+  const diasVal = Math.max(1, parseInt(diasLocacao) || 1);
   const total =
     anuncio?.tipo === "Locação"
-      ? anuncio.preco * diasLocacao
-      : anuncio?.preco * quantidade
-        ? anuncio.preco * quantidade
-        : 0;
+      ? (anuncio?.preco ?? 0) * diasVal * qtdVal
+      : (anuncio?.preco ?? 0) * qtdVal;
 
   if (loading) {
     return (
@@ -572,26 +577,50 @@ const ProductDetail = () => {
         </div>
 
         <div className="fixed bottom-16 left-0 right-0 bg-background border-t border-border p-4 shadow-lg">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Quantidade de itens — exibida para todos os tipos */}
             <div className="flex-1">
-              <label className="text-sm text-muted-foreground block mb-1">
-                {anuncio.tipo === "Locação" ? "Dias" : "Qtd"}
+              <label className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
+                <Boxes className="h-3 w-3" />
+                Itens
               </label>
               <Input
                 type="number"
                 min="1"
-                value={anuncio.tipo === "Locação" ? diasLocacao : quantidade}
-                onChange={(e) =>
-                  anuncio.tipo === "Locação"
-                    ? setDiasLocacao(Math.max(1, parseInt(e.target.value) || 1))
-                    : setQuantidade(Math.max(1, parseInt(e.target.value) || 1))
-                }
+                value={quantidade}
+                onChange={(e) => setQuantidade(e.target.value)}
+                onBlur={() => {
+                  const val = parseInt(quantidade);
+                  setQuantidade(String(isNaN(val) || val < 1 ? 1 : val));
+                }}
                 className="w-full"
               />
             </div>
+
+            {/* Dias de locação — exibida somente para Locação */}
+            {anuncio.tipo === "Locação" && (
+              <div className="flex-1">
+                <label className="text-xs text-muted-foreground flex items-center gap-1 mb-1">
+                  <Calendar className="h-3 w-3" />
+                  Dias
+                </label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={diasLocacao}
+                  onChange={(e) => setDiasLocacao(e.target.value)}
+                  onBlur={() => {
+                    const val = parseInt(diasLocacao);
+                    setDiasLocacao(String(isNaN(val) || val < 1 ? 1 : val));
+                  }}
+                  className="w-full"
+                />
+              </div>
+            )}
+
             <div className="flex-1">
-              <p className="text-sm text-muted-foreground mb-1">Total</p>
-              <p className="text-xl font-bold text-primary">
+              <p className="text-xs text-muted-foreground mb-1">Total</p>
+              <p className="text-lg font-bold text-primary">
                 R$ {total.toFixed(2)}
               </p>
             </div>
