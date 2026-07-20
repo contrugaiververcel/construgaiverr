@@ -83,7 +83,7 @@ const ChatConversation = () => {
       .select("nome, nome_empresa")
       .eq("id", recipientId)
       .single();
-    if (error) toast.error("N├úo foi poss├¡vel carregar informa├º├Áes do destinat├írio.");
+    if (error) toast.error("Não foi possível carregar informações do destinatário.");
     else setRecipient(data);
   };
 
@@ -118,8 +118,8 @@ const ChatConversation = () => {
 
     if (error) toast.error("Erro ao enviar mensagem.");
     else {
-      // A mensagem ├® mostrada pela resposta do INSERT. Assim, o remetente n├úo
-      // fica dependente da conex├úo Realtime para ver a pr├│pria mensagem.
+      // A mensagem é mostrada pela resposta do INSERT. Assim, o remetente não
+      // fica dependente da conexão Realtime para ver a própria mensagem.
       setMessages((current) => current.some((message) => message.id === data.id) ? current : [...current, data]);
       setNewMessage("");
     }

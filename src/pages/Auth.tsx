@@ -41,7 +41,7 @@ const Auth = () => {
         navigate("/home");
       } else {
         if (!aceitoTermos) {
-          toast.error("Voc├¬ precisa aceitar os termos e condi├º├Áes");
+          toast.error("Você precisa aceitar os termos e condições");
           setLoading(false);
           return;
         }
@@ -49,7 +49,7 @@ const Auth = () => {
         const dataNascimento = anoNasc && mesNasc && diaNasc
           ? `${anoNasc}-${mesNasc}-${diaNasc}`
           : "";
-        // Cadastro com confirma├º├úo de e-mail
+        // Cadastro com confirmação de e-mail
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -62,26 +62,26 @@ const Auth = () => {
               aceito_termos: aceitoTermos,
               role: tipoUsuario
             },
-            // Removendo emailRedirectTo para que o usu├írio precise confirmar o e-mail
+            // Removendo emailRedirectTo para que o usuário precise confirmar o e-mail
           },
         });
         
         if (error) throw error;
 
-        // Com a confirma├º├úo de e-mail ativada, o Supabase n├úo retorna erro para
-        // e-mails existentes: ele devolve um usu├írio sem identidades para evitar
-        // enumera├º├úo de contas. N├úo devemos tratar isso como um novo cadastro.
+        // Com a confirmação de e-mail ativada, o Supabase não retorna erro para
+        // e-mails existentes: ele devolve um usuário sem identidades para evitar
+        // enumeração de contas. Não devemos tratar isso como um novo cadastro.
         if (!data.user || data.user.identities?.length === 0) {
-          toast.error("Este e-mail j├í est├í cadastrado. Fa├ºa login ou recupere sua senha.");
+          toast.error("Este e-mail já está cadastrado. Faça login ou recupere sua senha.");
           return;
         }
         
         localStorage.setItem("pendingConfirmationEmail", email);
-        toast.success("Enviamos um c├│digo de confirma├º├úo para o seu e-mail.");
+        toast.success("Enviamos um código de confirmação para o seu e-mail.");
         navigate("/confirmar-email", { state: { email } });
       }
     } catch (error: any) {
-      toast.error(error.message || "Erro ao processar solicita├º├úo");
+      toast.error(error.message || "Erro ao processar solicitação");
     } finally {
       setLoading(false);
     }
@@ -149,14 +149,14 @@ const Auth = () => {
                     ))}
                   </select>
 
-                  {/* M├¬s */}
+                  {/* Mês */}
                   <select
                     value={mesNasc}
                     onChange={(e) => setMesNasc(e.target.value)}
                     required={!isLogin}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
-                    <option value="">M├¬s</option>
+                    <option value="">Mês</option>
                     {["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"].map((m, i) => (
                       <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
                         {m}
@@ -196,7 +196,7 @@ const Auth = () => {
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="vendedor" id="vendedor" />
                     <Label htmlFor="vendedor" className="font-normal cursor-pointer">
-                      Vendedor/Locat├írio - Anunciar produtos
+                      Vendedor/Locatário - Anunciar produtos
                     </Label>
                   </div>
                 </RadioGroup>
@@ -221,7 +221,7 @@ const Auth = () => {
             <Input
               id="password"
               type="password"
-              placeholder="ÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇóÔÇó"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -247,9 +247,9 @@ const Auth = () => {
                   }}
                   className="text-primary hover:underline font-medium"
                 >
-                  termos e condi├º├Áes
+                  termos e condições
                 </button>{" "}
-                e pol├¡ticas*
+                e políticas*
               </Label>
             </div>
           )}
@@ -266,8 +266,8 @@ const Auth = () => {
             className="text-primary hover:underline"
           >
             {isLogin
-              ? "N├úo tem conta? Cadastre-se"
-              : "J├í tem conta? Fa├ºa login"}
+              ? "Não tem conta? Cadastre-se"
+              : "Já tem conta? Faça login"}
           </button>
         </div>
       </Card>

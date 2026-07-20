@@ -107,7 +107,7 @@ const Chat = () => {
           <h1 className="text-2xl font-bold">Conversas</h1>
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <MessageCircle className="h-16 w-16 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground mb-2">Fa├ºa login para ver suas conversas</p>
+            <p className="text-muted-foreground mb-2">Faça login para ver suas conversas</p>
             <Button onClick={() => navigate("/auth")}>Fazer Login</Button>
           </div>
         </div>

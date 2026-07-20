@@ -23,7 +23,7 @@ const ConfirmEmail = () => {
   const confirmEmail = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!email) {
-      toast.error("Informe o e-mail usado no cadastro para confirmar o c├│digo.");
+      toast.error("Informe o e-mail usado no cadastro para confirmar o código.");
       return;
     }
 
@@ -32,18 +32,18 @@ const ConfirmEmail = () => {
     setLoading(false);
 
     if (error) {
-      toast.error("C├│digo inv├ílido ou expirado. Confira o e-mail e tente novamente.");
+      toast.error("Código inválido ou expirado. Confira o e-mail e tente novamente.");
       return;
     }
 
     localStorage.removeItem("pendingConfirmationEmail");
-    toast.success("E-mail confirmado! Sua conta j├í est├í ativa.");
+    toast.success("E-mail confirmado! Sua conta já está ativa.");
     navigate("/home");
   };
 
   const resendCode = async () => {
     if (!email) {
-      toast.error("Informe o e-mail usado no cadastro para reenviar o c├│digo.");
+      toast.error("Informe o e-mail usado no cadastro para reenviar o código.");
       return;
     }
 
@@ -52,10 +52,10 @@ const ConfirmEmail = () => {
     setResending(false);
 
     if (error) {
-      toast.error(error.message || "N├úo foi poss├¡vel reenviar o c├│digo agora.");
+      toast.error(error.message || "Não foi possível reenviar o código agora.");
       return;
     }
-    toast.success("Enviamos um novo c├│digo para o seu e-mail.");
+    toast.success("Enviamos um novo código para o seu e-mail.");
   };
 
   return (
@@ -67,7 +67,7 @@ const ConfirmEmail = () => {
           </div>
           <h1 className="text-2xl font-bold">Confirme seu e-mail</h1>
           <p className="text-sm text-muted-foreground">
-            Digite o c├│digo de 6 d├¡gitos enviado para o seu e-mail.
+            Digite o código de 6 dígitos enviado para o seu e-mail.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ const ConfirmEmail = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label>C├│digo de confirma├º├úo</Label>
+            <Label>Código de confirmação</Label>
             <InputOTP maxLength={6} value={token} onChange={setToken} containerClassName="justify-center">
               <InputOTPGroup>
                 {Array.from({ length: 6 }, (_, index) => <InputOTPSlot key={index} index={index} />)}
@@ -98,9 +98,9 @@ const ConfirmEmail = () => {
         </form>
 
         <div className="text-center text-sm space-y-3">
-          <p className="text-muted-foreground">N├úo recebeu o c├│digo?</p>
+          <p className="text-muted-foreground">Não recebeu o código?</p>
           <Button type="button" variant="link" className="p-0 h-auto" onClick={resendCode} disabled={resending}>
-            {resending ? "Reenviando..." : "Reenviar c├│digo"}
+            {resending ? "Reenviando..." : "Reenviar código"}
           </Button>
           <div>
             <Button type="button" variant="link" className="p-0 h-auto" onClick={() => navigate("/auth")}>

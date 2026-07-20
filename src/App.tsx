@@ -9,7 +9,7 @@ import Splash from "./pages/Splash";
 import Home from "./pages/Home";
 import Categorias from "./pages/Categorias";
 import Chat from "./pages/Chat";
-import ChatConversation from "./pages/ChatConversation"; // Nova importa├º├úo
+import ChatConversation from "./pages/ChatConversation"; // Nova importação
 import Carrinho from "./pages/Carrinho";
 import Perfil from "./pages/Perfil";
 import Auth from "./pages/Auth";
