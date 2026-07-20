@@ -1,7 +1,8 @@
 -- ============================================================
 -- FIX SIGNUP TRIGGER MIGRATION
 -- Aplicada em 2026-07-20
--- Torna a trigger de criação de perfil robusta contra erros de type cast e idempotente
+-- Torna a trigger de criação de perfil robusta contra erros de type cast,
+-- limpa registros órfãos por e-mail e garante a idempotência.
 -- ============================================================
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -14,6 +15,9 @@ DECLARE
   v_role TEXT;
   v_birth_date DATE;
 BEGIN
+  -- Remove registro órfão anterior com o mesmo e-mail (caso a conta antiga tenha sido deletada no Auth mas mantida no public.usuarios)
+  DELETE FROM public.usuarios WHERE email = new.email AND id <> new.id;
+
   -- Tratamento seguro da data de nascimento (evita erro de cast com strings vazias)
   IF new.raw_user_meta_data->>'data_nascimento' IS NOT NULL AND new.raw_user_meta_data->>'data_nascimento' <> '' THEN
     BEGIN
