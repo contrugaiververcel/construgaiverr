@@ -40,15 +40,32 @@ const Auth = () => {
         toast.success("Login realizado com sucesso!");
         navigate("/home");
       } else {
+        if (!nome.trim()) {
+          toast.error("Você precisa informar seu nome");
+          setLoading(false);
+          return;
+        }
+
+        if (!telefone.trim()) {
+          toast.error("Você precisa informar seu telefone");
+          setLoading(false);
+          return;
+        }
+
+        if (!diaNasc || !mesNasc || !anoNasc) {
+          toast.error("Você precisa preencher a data de nascimento completa");
+          setLoading(false);
+          return;
+        }
+
         if (!aceitoTermos) {
           toast.error("Você precisa aceitar os termos e condições");
           setLoading(false);
           return;
         }
         
-        const dataNascimento = anoNasc && mesNasc && diaNasc
-          ? `${anoNasc}-${mesNasc}-${diaNasc}`
-          : "";
+        const dataNascimento = `${anoNasc}-${mesNasc}-${diaNasc}`;
+
         // Cadastro com confirmação de e-mail
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -62,7 +79,6 @@ const Auth = () => {
               aceito_termos: aceitoTermos,
               role: tipoUsuario
             },
-            // Removendo emailRedirectTo para que o usuário precise confirmar o e-mail
           },
         });
         
